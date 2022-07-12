@@ -7,15 +7,15 @@ const StarWarsContext = createContext();
 const INITIAL_VALUES_FILTERS = {
   planet: '',
   operators: ['maior que', 'menor que', 'igual a'],
-  operatorSelected: 'maior que',
-  columnSelected: 'population',
+  operatorSelected: '',
+  columnSelected: '',
   column: [],
   numberReference: '0',
   orderBy: [],
 };
 
 const INITIAL_VALUES_ORDER = {
-  column: 'population',
+  column: '',
   sort: 'ASC',
 };
 
@@ -91,7 +91,7 @@ export const StarWarsProvider = ({ children }) => {
       const currentFilters = filters.column;
       const newFilters = currentFilters.filter((column) => column !== filter);
       setFilters((prevState) => ({
-        ...prevState, column: newFilters,
+        ...prevState, column: newFilters, columnSelected: '',
       }));
     },
     [filters],
@@ -120,6 +120,7 @@ export const StarWarsProvider = ({ children }) => {
     setFilters((prevState) => ({
       ...prevState,
       ...rest,
+      columnSelected: '',
     }));
   }, [filters, removeUsedFilters]);
 
