@@ -12,7 +12,7 @@ import {
   TextField,
 } from '@mui/material';
 import React from 'react';
-import { Formik, useFormik } from 'formik';
+import { useFormik } from 'formik';
 
 import * as Yup from 'yup';
 import useStarWarsContext from '../hooks/useStarWarsContext';
@@ -23,8 +23,8 @@ const Header = () => {
     order,
     filters,
     filtersApplied,
-    handleSetFilter,
-    handleClearAllFilters,
+    // handleSetFilter,
+    // handleClearAllFilters,
     handleValuesOrdanation,
     handleOrderDataByColumn,
     handleDeleteItemByIndex,
@@ -34,10 +34,9 @@ const Header = () => {
   const validationSchema = Yup.object({
     columnSelected: Yup.string().required('Informe uma coluna'),
     operatorSelected: Yup.string().required('Informe um operador'),
-    numberReference: Yup.number()
+    numberReference: Yup.string()
       .min(0, 'Informe um número maior ou igual a 0')
       .required('Informe um número válido'),
-    column: Yup.string().required('Informe uma coluna'),
     planet: Yup.string(),
   });
 
@@ -45,7 +44,6 @@ const Header = () => {
     columnSelected: '',
     operatorSelected: '',
     numberReference: '',
-    column: '',
     planet: '',
   };
 
@@ -54,8 +52,13 @@ const Header = () => {
     validationSchema,
     enableReinitialize: true,
     validateOnBlur: true,
-    onSubmit: async (data) => {
+    onSubmit: (data) => {
       console.log(data);
+      const keysFormik = Object.keys(data);
+
+      keysFormik.forEach((key) => {
+        handleInsertValueInFilter({ name: key, value: data[key] });
+      });
     },
   });
 
@@ -75,11 +78,8 @@ const Header = () => {
           type="text"
           name="planet"
           data-testid="name-filter"
-          value={ filters.planet }
-          onChange={ (e) => {
-            handleInsertValueInFilter(e.target);
-            formik.handleChange(e);
-          } }
+          value={ formik.values.planet }
+          onChange={ formik.handleChange }
           id="outlined-basic"
           label="Search"
           variant="outlined"
@@ -90,7 +90,7 @@ const Header = () => {
         <Autocomplete
           data-testid="column-filter"
           name="columnSelected"
-          value={ filters.columnSelected }
+          value={ formik.values.columnSelected }
           disablePortal
           id="column"
           options={ filters.column.map((key) => key) }
@@ -112,14 +112,14 @@ const Header = () => {
           ) }
           onInputChange={ (_, value, reason) => {
             if (reason === 'clear') {
-              handleInsertValueInFilter({
-                name: 'columnSelected',
-                value: filters.column[0],
-              });
+              // handleInsertValueInFilter({
+              //   name: 'columnSelected',
+              //   value: filters.column[0],
+              // });
               formik.setFieldValue('columnSelected', '');
             }
             if (reason === 'reset') {
-              handleInsertValueInFilter({ name: 'columnSelected', value });
+              // handleInsertValueInFilter({ name: 'columnSelected', value });
               formik.setFieldValue('columnSelected', value);
             }
           } }
@@ -127,7 +127,7 @@ const Header = () => {
         <Autocomplete
           data-testid="comparison-filter"
           name="operatorSelected"
-          value={ filters.operatorSelected }
+          value={ formik.values.operatorSelected }
           disablePortal
           id="column"
           options={ filters.operators.map((key) => key) }
@@ -149,14 +149,14 @@ const Header = () => {
           ) }
           onInputChange={ (_, value, reason) => {
             if (reason === 'clear') {
-              handleInsertValueInFilter({
-                name: 'operatorSelected',
-                value: 'maior que',
-              });
+              // handleInsertValueInFilter({
+              //   name: 'operatorSelected',
+              //   value: 'maior que',
+              // });
               formik.setFieldValue('operatorSelected', '');
             }
             if (reason === 'reset') {
-              handleInsertValueInFilter({ name: 'operatorSelected', value });
+              // handleInsertValueInFilter({ name: 'operatorSelected', value });
               formik.setFieldValue('operatorSelected', value);
             }
           } }
@@ -165,11 +165,8 @@ const Header = () => {
           type="number"
           name="numberReference"
           data-testid="value-filter"
-          value={ filters.numberReference }
-          onChange={ (e) => {
-            handleInsertValueInFilter(e.target);
-            formik.handleChange(e);
-          } }
+          value={ formik.values.numberReference }
+          onChange={ formik.handleChange }
           id="outlined-basic"
           label="Value"
           variant="outlined"
@@ -186,8 +183,6 @@ const Header = () => {
           data-testid="button-filter"
           variant="contained"
           type="submit"
-          onClick={ formik.handleSubmit }
-          // onClick={ handleSetFilter }
           endIcon={ <FilterList /> }
         >
           Filtrar
@@ -197,7 +192,7 @@ const Header = () => {
           variant="contained"
           data-testid="button-remove-filters"
           type="button"
-          onClick={ handleClearAllFilters }
+          // onClick={ handleClearAllFilters }
           sx={ { margin: '0 0.3rem' } }
           endIcon={ <Clear /> }
         >
