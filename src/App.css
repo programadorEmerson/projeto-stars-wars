@@ -29,16 +29,6 @@
   color: #61dafb;
 }
 
-#background-video {
-  background-color: black;
-  float: left;
-  height: 100%;
-  padding: none;
-  position: fixed; /* optional depending on what you want to do in your app */
-  top: 0;
-  width: 100%;
-}
-
 @keyframes App-logo-spin {
 
   from {

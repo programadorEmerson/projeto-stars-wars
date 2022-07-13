@@ -7,15 +7,15 @@ const StarWarsContext = createContext();
 const INITIAL_VALUES_FILTERS = {
   planet: '',
   operators: ['maior que', 'menor que', 'igual a'],
-  operatorSelected: '',
-  columnSelected: '',
+  operatorSelected: 'maior que',
+  columnSelected: 'population',
   column: [],
   numberReference: '0',
   orderBy: [],
 };
 
 const INITIAL_VALUES_ORDER = {
-  column: '',
+  column: 'population',
   sort: 'ASC',
 };
 
@@ -54,19 +54,18 @@ export const StarWarsProvider = ({ children }) => {
     setOrder((prevState) => ({ ...prevState, [name]: value }));
   };
 
-  const handleClearAllFilters = () => {
+  const handleClearAllFilters = useCallback(() => {
     setLoading(true);
     const {
       planet: planetSearch,
-      orderBy, column,
-      ...rest
+      orderBy, column, ...rest
     } = INITIAL_VALUES_FILTERS;
-    setFilters((prevState) => ({ ...prevState, column: prevState.orderBy, ...rest }));
+    setFilters((prevState) => ({ ...prevState, ...rest }));
     setOrder(INITIAL_VALUES_ORDER);
     setData(rawData);
     setFiltersApplied([]);
     setLoading(false);
-  };
+  }, [rawData]);
 
   const handleAddFilterDeleted = useCallback(
     (filter) => {
@@ -92,7 +91,7 @@ export const StarWarsProvider = ({ children }) => {
       const currentFilters = filters.column;
       const newFilters = currentFilters.filter((column) => column !== filter);
       setFilters((prevState) => ({
-        ...prevState, column: newFilters, columnSelected: '',
+        ...prevState, column: newFilters,
       }));
     },
     [filters],
@@ -121,7 +120,6 @@ export const StarWarsProvider = ({ children }) => {
     setFilters((prevState) => ({
       ...prevState,
       ...rest,
-      columnSelected: '',
     }));
   }, [filters, removeUsedFilters]);
 
@@ -161,6 +159,7 @@ export const StarWarsProvider = ({ children }) => {
   const handleRequestDataApi = useCallback(async () => {
     setLoading(true);
     const response = await requestApi();
+    // order by name to localeCompare sort the data
     const dataOrderByName = response.sort((a, b) => a.name.localeCompare(b.name));
     setData(dataOrderByName);
     setRawData(dataOrderByName);
