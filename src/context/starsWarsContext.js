@@ -54,18 +54,19 @@ export const StarWarsProvider = ({ children }) => {
     setOrder((prevState) => ({ ...prevState, [name]: value }));
   };
 
-  const handleClearAllFilters = useCallback(() => {
+  const handleClearAllFilters = () => {
     setLoading(true);
     const {
       planet: planetSearch,
-      orderBy, column, ...rest
+      orderBy, column,
+      ...rest
     } = INITIAL_VALUES_FILTERS;
-    setFilters((prevState) => ({ ...prevState, ...rest }));
+    setFilters((prevState) => ({ ...prevState, column: prevState.orderBy, ...rest }));
     setOrder(INITIAL_VALUES_ORDER);
     setData(rawData);
     setFiltersApplied([]);
     setLoading(false);
-  }, [rawData]);
+  };
 
   const handleAddFilterDeleted = useCallback(
     (filter) => {
@@ -160,7 +161,6 @@ export const StarWarsProvider = ({ children }) => {
   const handleRequestDataApi = useCallback(async () => {
     setLoading(true);
     const response = await requestApi();
-    // order by name to localeCompare sort the data
     const dataOrderByName = response.sort((a, b) => a.name.localeCompare(b.name));
     setData(dataOrderByName);
     setRawData(dataOrderByName);

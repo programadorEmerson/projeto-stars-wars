@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { Clear, FilterList, ListTwoTone } from '@mui/icons-material';
 import {
   Autocomplete,
@@ -23,8 +24,8 @@ const Header = () => {
     order,
     filters,
     filtersApplied,
-    // handleSetFilter,
-    // handleClearAllFilters,
+    handleSetFilter,
+    handleClearAllFilters,
     handleValuesOrdanation,
     handleOrderDataByColumn,
     handleDeleteItemByIndex,
@@ -34,7 +35,7 @@ const Header = () => {
   const validationSchema = Yup.object({
     columnSelected: Yup.string().required('Informe uma coluna'),
     operatorSelected: Yup.string().required('Informe um operador'),
-    numberReference: Yup.string()
+    numberReference: Yup.number()
       .min(0, 'Informe um número maior ou igual a 0')
       .required('Informe um número válido'),
     planet: Yup.string(),
@@ -45,6 +46,7 @@ const Header = () => {
     operatorSelected: '',
     numberReference: '',
     planet: '',
+    column: 'population',
   };
 
   const formik = useFormik({
@@ -52,13 +54,9 @@ const Header = () => {
     validationSchema,
     enableReinitialize: true,
     validateOnBlur: true,
-    onSubmit: (data) => {
-      console.log(data);
-      const keysFormik = Object.keys(data);
-
-      keysFormik.forEach((key) => {
-        handleInsertValueInFilter({ name: key, value: data[key] });
-      });
+    onSubmit: () => {
+      handleSetFilter();
+      formik.resetForm();
     },
   });
 
@@ -69,7 +67,7 @@ const Header = () => {
         direction="row"
         sx={ {
           display: 'flex',
-          alignItems: 'center',
+          alignItems: 'flex-start',
           justifyContent: 'center',
           marginBottom: '0.5rem',
         } }
@@ -79,7 +77,13 @@ const Header = () => {
           name="planet"
           data-testid="name-filter"
           value={ formik.values.planet }
-          onChange={ formik.handleChange }
+          onChange={ (e) => {
+            formik.handleChange(e);
+            handleInsertValueInFilter({
+              name: 'planet',
+              value: e.target.value,
+            });
+          } }
           id="outlined-basic"
           label="Search"
           variant="outlined"
@@ -112,14 +116,11 @@ const Header = () => {
           ) }
           onInputChange={ (_, value, reason) => {
             if (reason === 'clear') {
-              // handleInsertValueInFilter({
-              //   name: 'columnSelected',
-              //   value: filters.column[0],
-              // });
+              handleInsertValueInFilter({ name: 'columnSelected', value: '' });
               formik.setFieldValue('columnSelected', '');
             }
             if (reason === 'reset') {
-              // handleInsertValueInFilter({ name: 'columnSelected', value });
+              handleInsertValueInFilter({ name: 'columnSelected', value });
               formik.setFieldValue('columnSelected', value);
             }
           } }
@@ -149,14 +150,14 @@ const Header = () => {
           ) }
           onInputChange={ (_, value, reason) => {
             if (reason === 'clear') {
-              // handleInsertValueInFilter({
-              //   name: 'operatorSelected',
-              //   value: 'maior que',
-              // });
+              handleInsertValueInFilter({
+                name: 'operatorSelected',
+                value: '',
+              });
               formik.setFieldValue('operatorSelected', '');
             }
             if (reason === 'reset') {
-              // handleInsertValueInFilter({ name: 'operatorSelected', value });
+              handleInsertValueInFilter({ name: 'operatorSelected', value });
               formik.setFieldValue('operatorSelected', value);
             }
           } }
@@ -166,7 +167,13 @@ const Header = () => {
           name="numberReference"
           data-testid="value-filter"
           value={ formik.values.numberReference }
-          onChange={ formik.handleChange }
+          onChange={ (e) => {
+            formik.handleChange(e);
+            handleInsertValueInFilter({
+              name: 'numberReference',
+              value: e.target.value,
+            });
+          } }
           id="outlined-basic"
           label="Value"
           variant="outlined"
@@ -192,7 +199,9 @@ const Header = () => {
           variant="contained"
           data-testid="button-remove-filters"
           type="button"
-          // onClick={ handleClearAllFilters }
+          onClick={ () => {
+            handleClearAllFilters();
+          } }
           sx={ { margin: '0 0.3rem' } }
           endIcon={ <Clear /> }
         >
@@ -238,11 +247,16 @@ const Header = () => {
                 if (reason === 'clear') {
                   handleValuesOrdanation({
                     name: 'column',
-                    value: filters.orderBy[0],
+                    value: '',
                   });
+                  formik.setFieldValue('column', '');
                 }
                 if (reason === 'reset') {
-                  handleValuesOrdanation({ name: 'column', value });
+                  handleValuesOrdanation({
+                    name: 'column',
+                    value,
+                  });
+                  formik.setFieldValue('column', value);
                 }
               } }
             />
@@ -300,7 +314,7 @@ const Header = () => {
             type="button"
             color="primary"
             onClick={ () => handleDeleteItemByIndex(index) }
-            sx={ { display: 'flex', maxWidth: '35rem', margin: '0 0.3rem' } }
+            sx={ { display: 'flex', maxWidth: '35rem', margin: '0.3rem' } }
           />
         ))}
       </Box>
