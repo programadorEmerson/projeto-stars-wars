@@ -1,4 +1,4 @@
-export const END_POINT = 'https://swapi-trybe.herokuapp.com/api/planets/';
+export const END_POINT = 'https://swapi.dev/api/planets';
 
 export const requestApi = async () => {
   const response = await fetch(END_POINT);
